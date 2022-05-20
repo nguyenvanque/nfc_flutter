@@ -21,9 +21,9 @@ public class MainActivity extends FlutterActivity {
         super.configureFlutterEngine(flutterEngine);
         Intent intentD=getIntent();
         String data= intentD.getStringExtra("name");
-        if(data!=null){
-            Toast.makeText(this, data, Toast.LENGTH_SHORT).show();
-        }
+//        if(data!=null){
+//            Toast.makeText(this, data, Toast.LENGTH_SHORT).show();
+//        }
         new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
                 .setMethodCallHandler(
                         (call, result) -> {
@@ -33,7 +33,7 @@ public class MainActivity extends FlutterActivity {
                                     Intent intent =new Intent(this, NativeAndroidActivity.class);
                                 startActivity(intent);
                                 result.success(true);
-                            }else if(call.method.equals("getMessage")){
+                            }else if(call.method.equals("getDataNfc")){
 
                                 String from = (String) arguments.get("from");
 

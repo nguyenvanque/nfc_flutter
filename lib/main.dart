@@ -33,18 +33,19 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   static const platform = MethodChannel(CHANNEL);
-  String? _message;
+  String _message="";
   @override
   void initState() {
-    // if(_message!=null){
-    //   _showMyDialog(_message);
-    // }
-   _showMyDialog("message");
     _getMessage().then((String message) {
       setState(() {
         _message = message;
+        if(message!=null||!message.isEmpty){
+          Future.delayed(Duration.zero, () => _showMyDialog(message));
+        }
       });
+
     });
+
     super.initState();
   }
 
@@ -58,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child:  Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(_message==null||_message!.isEmpty?"No data":_message!,style: TextStyle(fontSize: 30,color: Colors.blue),),
+            Text(_message==null||_message.isEmpty?"No data":_message,style: TextStyle(fontSize: 30,color: Colors.blue),),
             SizedBox(height: 20,),
             ElevatedButton(
               child:  Text('Open NFC'),
@@ -117,8 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
     };
     String? value;
     try {
-      value = await platform.invokeMethod('getMessage', sendMap);
-      print("getmessagesfl;ndf;a;f;dfdskf'kadgsg's'dkg'ks'kgfs'akg'");
+      value = await platform.invokeMethod('getDataNfc', sendMap);
 
     } catch (e) {
       print(e);
