@@ -320,8 +320,14 @@ public class DLReaderTask implements Runnable {
 //            this.activity.showText(name+"\n"+nameKana+"\n"+birthday+"\n"+addressOrg+"\n"+expiredDate+"\n"+licenseIdNo+"\n"+newAddress);
 
             // Viewerを起動
-            Intent intent = new Intent(activity, DLViewerActivity.class);
-            intent.putExtra("json", obj.toString());
+//            Intent intent = new Intent(activity, DLViewerActivity.class);
+//            intent.putExtra("json", obj.toString());
+//            activity.startActivity(intent);
+
+            Intent intent = new Intent(activity, MainActivity.class);
+            intent.putExtra("data",obj.toString());
+//                intent.setAction(Intent.ACTION_RUN);
+//                intent.putExtra("route", "/reader_page");
             activity.startActivity(intent);
         } catch (Exception e) {
             Log.e(TAG, "error", e);
