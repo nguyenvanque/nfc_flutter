@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.nfc.Tag;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -44,13 +45,6 @@ public class DLReaderTask implements Runnable {
     private String pin1;
     private String pin2;
     private DLReaderActivity activity;
-//    private  String name="氏名: ";
-//    private  String nameKana="呼び名(カナ): ";
-//    private  String birthday="生年月日: ";
-//    private  String addressOrg="住所: ";
-//    private  String expiredDate=" 有効期限の末日: ";
-//    private  String licenseIdNo="免許証の番号: ";
-//    private  String newAddress="新住所: ";
 
 
     public DLReaderTask(DLReaderActivity activity,
@@ -66,8 +60,10 @@ public class DLReaderTask implements Runnable {
     public void run() {
         Log.d(TAG, getClass().getSimpleName() + "#run()");
         this.activity.clear();
-        pin1 = activity.getPin1();
-        pin2 = activity.getPin2();
+//        pin1 = activity.getPin1();
+//        pin2 = activity.getPin2();
+        pin1 = MainActivity.pin1;
+        pin2 = MainActivity.pin2;
 
         activity.hideKeyboard();
 

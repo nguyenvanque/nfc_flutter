@@ -9,15 +9,15 @@ const KEY_NATIVE = "showNativeView";
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
+    return MaterialApp(
       title: 'Flutter NFC',
       initialRoute: '/',
       routes: {
         '/': (context) => MyHomePage(),
         '/reader_page': (context) => MyHomePage(),
-
       },
-      theme:  ThemeData(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
         primarySwatch: Colors.green,
       ),
     );
@@ -33,18 +33,21 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   static const platform = MethodChannel(CHANNEL);
-  String _message="";
+  String _message = "";
+
+  final edtP1 = TextEditingController();
+  final edtP2 = TextEditingController();
+
   @override
   void initState() {
-    _getMessage().then((String message) {
-      setState(() {
-        _message = message;
-        if(message!=null||!message.isEmpty){
-          Future.delayed(Duration.zero, () => _showMyDialog(message));
-        }
-      });
-
-    });
+    // _getMessage().then((String message) {
+    //   setState(() {
+    //     _message = message;
+    //     if (message != null || !message.isEmpty) {
+    //       Future.delayed(Duration.zero, () => _showMyDialog(message));
+    //     }
+    //   });
+    // });
 
     super.initState();
   }
@@ -52,28 +55,62 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:  AppBar(
-        title:  Text("Flutter NFC"),
+      appBar: AppBar(
+        title: Text("Flutter NFC"),
       ),
-      body:  Center(
-        child:  Column(
+      body: Center(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(_message==null||_message.isEmpty?"No data":_message,style: TextStyle(fontSize: 30,color: Colors.blue),),
-            SizedBox(height: 20,),
-            ElevatedButton(
-              child:  Text('Open NFC'),
-              onPressed: showNativeView,
+            Text(
+              _message == null || _message.isEmpty ? "No data" : _message,
+              style: TextStyle(fontSize: 30, color: Colors.blue),
             ),
-            ElevatedButton(
-              child:  Text('Open dialog'),
-              onPressed: ()=>_showMyDialog("ddd"),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: edtP1,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: '',
+                    hintText: 'Enter Your pin1'),
+              ),
             ),
+            SizedBox(
+              height: 20.0,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: edtP2,
+                decoration:
+                    InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: '',
+                        hintText: 'Enter Your pin2'),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            // ElevatedButton(
+            //   child: Text('Open NFC'),
+            //   onPressed: showNativeView,
+            // ),
+            ElevatedButton(
+              child: Text('Scan NFC'),
+              onPressed: _getMessage,
+            ),
+            // ElevatedButton(
+            //   child:  Text('Open dialog'),
+            //   onPressed: ()=>_showMyDialog("ddd"),
+            // ),
           ],
         ),
       ),
     );
   }
+
   Future<void> _showMyDialog(message) async {
     return showDialog<void>(
       context: context,
@@ -83,15 +120,21 @@ class _MyHomePageState extends State<MyHomePage> {
           title: const Text('Notification has data'),
           content: SingleChildScrollView(
             child: ListBody(
-              children:  <Widget>[
+              children: <Widget>[
                 Text('This is data scan nfc'),
-                Text(message,style: TextStyle(fontSize: 20,color: Colors.black),),
+                Text(
+                  message,
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Approve'),
+              child: const Text('Close  '),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -101,6 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+
   Future<Null> showNativeView() async {
     await platform.invokeMethod(KEY_NATIVE);
   }
@@ -112,14 +156,14 @@ class _MyHomePageState extends State<MyHomePage> {
         return Future.value("");
     }
   }
+
   Future<String> _getMessage() async {
-    var sendMap = <String, dynamic> {
-      'from' : 'Brandon',
-    };
+    var sendMap = <String, dynamic>{
+      'edtP1': edtP1.text,
+      'edtP2': edtP2.text};
     String? value;
     try {
-      value = await platform.invokeMethod('getDataNfc', sendMap);
-
+      value = await platform.invokeMethod('getPin', sendMap);
     } catch (e) {
       print(e);
     }
@@ -127,7 +171,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return value!;
   }
 }
-
 
 // class MyHomePage extends StatelessWidget {
 //

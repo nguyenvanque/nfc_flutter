@@ -45,8 +45,7 @@ public abstract class BaseActivity extends AppCompatActivity implements TagDisco
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, getClass().getSimpleName() +
-              "#onCreate(" + savedInstanceState + ")");
+        Log.d(TAG, getClass().getSimpleName() + "#onCreate(" + savedInstanceState + ")");
         super.onCreate(savedInstanceState);
 
         // NFC読み取りモードの設定値を取得
