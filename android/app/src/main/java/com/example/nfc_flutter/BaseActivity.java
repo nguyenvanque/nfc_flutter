@@ -1,7 +1,6 @@
 package com.example.nfc_flutter;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -26,12 +25,11 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-
 public abstract class BaseActivity extends AppCompatActivity implements TagDiscoveredListener
 {
     public static final String TAG = "JeidReader";
     protected NfcAdapter nfcAdapter;
-
+    String tag="NFC";
 
     // NFC読み取りモード
     private final int NFC_AUTO_MODE = 0;
@@ -45,7 +43,8 @@ public abstract class BaseActivity extends AppCompatActivity implements TagDisco
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, getClass().getSimpleName() + "#onCreate(" + savedInstanceState + ")");
+        Log.d(TAG, getClass().getSimpleName() +
+              "#onCreate(" + savedInstanceState + ")");
         super.onCreate(savedInstanceState);
 
         // NFC読み取りモードの設定値を取得
@@ -133,7 +132,6 @@ public abstract class BaseActivity extends AppCompatActivity implements TagDisco
     }
 
 
-    @TargetApi(Build.VERSION_CODES.CUPCAKE)
     protected void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm == null) {
@@ -146,22 +144,25 @@ public abstract class BaseActivity extends AppCompatActivity implements TagDisco
         imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
-
-
-    protected void addMessage(String message) {
-        TextView text = findViewById(R.id.message);
-        text.setText(text.getText().toString() + "\n" + message);
-        // 一番下にスクロール
-        final ScrollView scroll = findViewById(R.id.scroll);
-        scroll.post(new Runnable() {
-                public void run() {
-                    scroll.fullScroll(ScrollView.FOCUS_DOWN);
-                }
-            });
+    protected void setMessage(String message) {
+        TextView view = (TextView)findViewById(R.id.message);
+        view.setText(message);
     }
 
+//    protected void addMessage(String message) {
+//        TextView text = (TextView)findViewById(R.id.message);
+//        text.setText(text.getText().toString() + "\n" + message);
+//        // 一番下にスクロール
+//        final ScrollView scroll = (ScrollView)findViewById(R.id.scroll);
+//        scroll.post(new Runnable() {
+//                public void run() {
+//                    scroll.fullScroll(ScrollView.FOCUS_DOWN);
+//                }
+//            });
+//    }
+
     protected void clear() {
-        TextView view =findViewById(R.id.message);
+        TextView view = (TextView)findViewById(R.id.message);
         view.post(new Runnable() {
                 @Override
                 public void run() {
@@ -172,11 +173,12 @@ public abstract class BaseActivity extends AppCompatActivity implements TagDisco
 
     protected void print(String msg) {
         Handler handler = new Handler(Looper.getMainLooper());
-        TextView text =findViewById(R.id.message);
-        ScrollView scroll = findViewById(R.id.scroll);
+        TextView text = (TextView)findViewById(R.id.message);
+        ScrollView scroll = (ScrollView)findViewById(R.id.scroll);
         handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    Toast.makeText(BaseActivity.this, msg, Toast.LENGTH_SHORT).show();
                     text.setText(text.getText().toString() + msg + "\n");
                     // 一番下にスクロール
                     scroll.fullScroll(ScrollView.FOCUS_DOWN);

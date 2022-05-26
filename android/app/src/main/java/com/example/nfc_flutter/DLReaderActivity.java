@@ -42,9 +42,9 @@ public class DLReaderActivity extends BaseActivity {
             Log.d(TAG, getClass().getSimpleName() + ": NFC disabled.");
             return;
         }
-        DLReaderTask task = new DLReaderTask(DLReaderActivity.this, tag);
-        ExecutorService exec = Executors.newSingleThreadExecutor();
-        exec.submit(task);
+//        DLReaderTask task = new DLReaderTask(DLReaderActivity.this, tag);
+//        ExecutorService exec = Executors.newSingleThreadExecutor();
+//        exec.submit(task);
     }
 
     protected String getPin1() {

@@ -1,5 +1,6 @@
 package com.example.nfc_flutter;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.nfc.Tag;
@@ -15,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -39,27 +41,31 @@ import jp.co.osstech.libjeid.util.BitmapARGB;
 import jp.co.osstech.libjeid.util.Hex;
 
 public class DLReaderTask implements Runnable {
-    private static final String TAG = MainNfcActivity.TAG;
+    private static final String TAG = MainActivity.TAG;
     private static final String DPIN = "****";
     private Tag nfcTag;
     private String pin1;
     private String pin2;
-    private DLReaderActivity activity;
+    private App activity;
+    HashMap<String,String> hashMap=new HashMap<String,String>();
 
 
-    public DLReaderTask(DLReaderActivity activity,
-                        Tag nfcTag) {
+    public DLReaderTask(App activity, Tag nfcTag) {
         this.activity = activity;
         this.nfcTag = nfcTag;
     }
 
     private void publishProgress(String msg) {
-        this.activity.print(msg);
+         activity.print(msg);
     }
+
+//    private void sendData(){
+//        activity.getHasData(hashMap);
+//    }
 
     public void run() {
         Log.d(TAG, getClass().getSimpleName() + "#run()");
-        this.activity.clear();
+//        this.activity.clear();
 //        pin1 = activity.getPin1();
 //        pin2 = activity.getPin2();
         pin1 = MainActivity.pin1;
@@ -69,8 +75,14 @@ public class DLReaderTask implements Runnable {
 
 //        publishProgress("# 読み取り開始、カードを離さないでください");
         // 読み取り中ダイアログを表示
-       ProgressDialogFragment progress = new ProgressDialogFragment();
-        progress.show(activity.getSupportFragmentManager(), "progress");
+//       ProgressDialogFragment progress = new ProgressDialogFragment();
+//        progress.show(activity., "progress");
+
+
+        ProgressDialog progressdialog = new ProgressDialog(activity);
+        progressdialog.setMessage("Loading....");
+        progressdialog.show();
+
 
         try {
             JeidReader reader = new JeidReader(this.nfcTag);
@@ -89,11 +101,13 @@ public class DLReaderTask implements Runnable {
             // 共通データ要素と暗証番号(PIN)設定のみを読み出します。
             DriverLicenseFiles freeFiles = ap.readFiles();
             DriverLicenseCommonData commonData = freeFiles.getCommonData();
-       DLPinSetting pinSetting = freeFiles.getPinSetting();
+            DLPinSetting pinSetting = freeFiles.getPinSetting();
 //            publishProgress("## 共通データ要素");
 //            publishProgress(commonData.toString());
 //            publishProgress("## 暗証番号(PIN)設定");
 //            publishProgress(pinSetting.toString());
+
+
 
             if (pin1.isEmpty()) {
 //                publishProgress("暗証番号1を設定してください");
@@ -107,7 +121,7 @@ public class DLReaderTask implements Runnable {
             try {
                 ap.verifyPin1(pin1);
             } catch (InvalidPinException e) {
-                activity.showInvalidPinDialog("暗証番号1", e);
+//                MainActivity.showInvalidPinDialog("暗証番号1", e);
                 return;
             }
 
@@ -118,7 +132,7 @@ public class DLReaderTask implements Runnable {
                 try {
                     ap.verifyPin2(pin2);
                 } catch (InvalidPinException e) {
-                    activity.showInvalidPinDialog("暗証番号2", e);
+//                    MainActivity.showInvalidPinDialog("暗証番号2", e);
                     return;
                 }
             }
@@ -194,14 +208,25 @@ public class DLReaderTask implements Runnable {
 
 //            publishProgress(entries.toString());
             publishProgress(entries.getName().toString());
+
             publishProgress(entries.getKana());
             publishProgress(String.valueOf(entries.getBirthDate()));
             publishProgress(entries.getAddr().toString());
             publishProgress(expireDate.toString());
             publishProgress(entries.getLicenseNumber());
+
+
             // 記載事項変更等(本籍除く）を取得
             DriverLicenseChangedEntries changedEntries = files.getChangedEntries();
             publishProgress(changedEntries.toString());
+
+            hashMap.put("name",entries.getName().toString());
+            hashMap.put("kana",entries.getKana());
+            hashMap.put("birthDate",String.valueOf(entries.getBirthDate()));
+            hashMap.put("licenseNumber",entries.getLicenseNumber());
+            hashMap.put("entries",changedEntries.toString());
+
+//            sendData();
 
             JSONArray changesObj = new JSONArray();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
@@ -312,24 +337,25 @@ public class DLReaderTask implements Runnable {
             // 記載事項変更等(本籍除く）と記載事項変更（本籍）合わせた
             // オブジェクトをJSONに追加
             obj.put("dl-changes", changesObj);
+            progressdialog.dismiss();
 
-//            this.activity.showText(name+"\n"+nameKana+"\n"+birthday+"\n"+addressOrg+"\n"+expiredDate+"\n"+licenseIdNo+"\n"+newAddress);
 
             // Viewerを起動
 //            Intent intent = new Intent(activity, DLViewerActivity.class);
 //            intent.putExtra("json", obj.toString());
 //            activity.startActivity(intent);
 
-            Intent intent = new Intent(activity, MainActivity.class);
-            intent.putExtra("data",obj.toString());
+//            Intent intent = new Intent(activity, MainActivity.class);
+//            intent.putExtra("data",obj.toString());
 //                intent.setAction(Intent.ACTION_RUN);
 //                intent.putExtra("route", "/reader_page");
-            activity.startActivity(intent);
+//            activity.startActivity(intent);
         } catch (Exception e) {
             Log.e(TAG, "error", e);
 //            publishProgress("エラー: " + e);
         } finally {
-            progress.dismissAllowingStateLoss();
+             progressdialog.dismiss();
+//            progress.dismissAllowingStateLoss();
         }
     }
 }
